@@ -24,7 +24,11 @@ fn main() {
                 let mut sys = sysinfo::System::new_all();
                 loop {
                     sys.refresh_all();
-                    write_sys_to_port(&mut port, &sys);
+                    match write_sys_to_port(&mut port, &sys) {
+                        Ok(()) => {},
+                        Err(serialport::Error {kind, description}) => 
+                            println!("{:?} error while writing to port: {}", kind, description)
+                    }
                     thread::sleep(Duration::from_secs(1));
                 }
             }
@@ -45,4 +49,5 @@ fn write_sys_to_port(port: &mut Box<dyn serialport::SerialPort>, sys: &sysinfo::
     port.write(b"\0")?;
     return Ok(());
 }
+
 
